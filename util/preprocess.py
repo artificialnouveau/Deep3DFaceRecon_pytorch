@@ -34,16 +34,18 @@ def POS(xp, x):
 
     b = np.reshape(xp.transpose(), [2*npts, 1])
 
-    k, _, _, _ = np.linalg.lstsq(A, b)
+    k, _, _, _ = np.linalg.lstsq(A, b, rcond=None)
 
     R1 = k[0:3]
     R2 = k[4:7]
     sTx = k[3]
     sTy = k[7]
     s = (np.linalg.norm(R1) + np.linalg.norm(R2))/2
-    t = np.stack([sTx, sTy], axis=0)
+    t = np.stack([sTx, sTy], axis=0).astype(np.float32)
 
-    return t, s
+    # Ensure t is a tuple of two floats
+    return tuple(map(float, t.flatten())), s
+
 
 # bounding box for 68 landmark detection
 def BBRegression(points, params):
